@@ -1,0 +1,64 @@
+body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 1em;
+    padding: 0.5em;
+  }
+  
+  pw-cadastro, pw-listagem, pw-status {
+    border: 1px solid gray;
+    padding: 0.5em;
+  }
+  
+  pw-cadastro *, pw-listagem *, pw-status * {
+    margin: 0.5em;
+  }
+  span { margin: 0; }
+  
+  pw-status {
+    background-color: #ddf;
+  }
+  
+  pw-listagem {
+    background-color: #dfd;
+  }
+  pw-listagem p, pw-cadastro p, pw-status {
+    text-align: center;
+  }
+  
+  pw-cadastro {
+    background-color: #fdd;
+    align-items: baseline;
+  }
+  
+  pw-cadastro div {
+    background-color: #fdd;
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    align-items: baseline;
+    grid-template-rows: min-content min-content min-content;
+    grid-column-gap: 0.5em;
+  }
+  
+  pw-disciplina, pw-periodo {
+    display: grid;
+    grid-template-columns: min-content 1fr min-content;
+    border: 1px solid lightgray;
+    border-radius: 6px;
+    background-color: white;
+    justify-content: space-between;
+  }
+  
+  pw-disciplina:hover, pw-periodo:hover {
+    background-color: yellow;
+  }
+  
+  pw-disciplina.removing {
+    background-color: white;
+    animation: fadeOut 1s;
+  }
+  
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
