@@ -1,4 +1,4 @@
-import { PW_Cadastro } from "./cadastro.js";
+import { PW_Cadastro } from './cadastro.js';
 
 const $template = document.createElement("template");
 $template.innerHTML = `
@@ -10,8 +10,9 @@ class PW_Resumo extends HTMLElement {
 
     cadastro = new PW_Cadastro()
 
-    async notify() {
-        return this.cadastro.notify()
+    notify(data) {
+        this.disciplinas = data;
+        this.update()
     }
 
     async connectedCallback() {
@@ -19,10 +20,11 @@ class PW_Resumo extends HTMLElement {
         this.appendChild(clone)
         this.$resumo = this.querySelector("div");
         this.disciplinas = await this.cadastro.get_disciplinas()
-        this.update()
+        this.notify(this.disciplinas)        
     }
 
     update() {
+        this.$resumo.innerHTML = ''
         const disciplinasPorPeriodo = {};
         const periodosCadastrados = new Set();
 
@@ -50,11 +52,11 @@ class PW_Resumo extends HTMLElement {
                 this.$resumo.appendChild($periodo);
             }
         }
-
         this.$paragrafo = document.createElement("p");
         this.$paragrafo.innerHTML = `${this.disciplinas.length} disciplinas cadastradas e ${numeroDePeriodos} períodos cadastrados`
         this.$resumo.appendChild(this.$paragrafo)
     }
+    
 }
 
 customElements.define("pw-status", PW_Resumo);

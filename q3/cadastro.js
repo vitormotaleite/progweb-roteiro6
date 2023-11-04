@@ -13,26 +13,6 @@ $template.innerHTML = `
 `;
 
 class PW_Cadastro extends HTMLElement {
-
-    async get_disciplinas() {
-        return backend.fetch_disciplinas()
-
-    }
-
-    async del_disciplina(i) {
-        return backend.del_disciplina(i)
-    }
-
-    async notify() {
-        if(window.Notification&&Notification.permission !== 'denied') {
-            Notification.requestPermission(function(status) {
-                let n = new Notification('ATENÇÂO', {
-                    body: 'disciplina alterada'
-                })
-            })
-        }
-    }
-    
     async connectedCallback() {
         let clone = $template.content.cloneNode(true);
         this.appendChild(clone);
@@ -67,13 +47,38 @@ class PW_Cadastro extends HTMLElement {
         this.$button.innerText = "salvando...";
         await backend.add_disciplina({nome, periodo});
         this.disciplinas.push({nome, periodo});
-        this.notify()
+        this.notify();
         this.$nome.value = "";
         this.$periodo.value = "";
         this.$nome.disabled = false;
         this.$periodo.disabled = false;
         this.$nome.focus();
+        this.update()
+    }
+
+    async get_disciplinas() {
+        return backend.fetch_disciplinas();
+    }
+
+    async del_disciplina(i) {
+        backend.del_disciplina(i)
+    }
+
+    notify2(data) {
+        this.disciplinas = data;
         this.update();
+    }
+
+    notify() {
+        const pwListagem = document.querySelector('pw-listagem');
+        if (pwListagem) {
+            pwListagem.notify(this.disciplinas);
+        }
+
+        const pwStatus = document.querySelector('pw-status');
+        if (pwStatus) {
+            pwStatus.notify(this.disciplinas);
+        }
     }
 
     update() {
@@ -81,9 +86,8 @@ class PW_Cadastro extends HTMLElement {
         this.$button.innerText = "Salva disciplina";
         this.$contagem.innerText = this.disciplinas.length;
     }
-
 }
 
-export{PW_Cadastro}
+export {PW_Cadastro}
 
 customElements.define("pw-cadastro", PW_Cadastro);
