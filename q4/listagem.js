@@ -1,4 +1,4 @@
-import { PW_Cadastro } from "./cadastro.js";
+import { PW_Cadastro } from './cadastro.js';
 
 const $template = document.createElement("template");
 $template.innerHTML = `
@@ -9,19 +9,36 @@ $template.innerHTML = `
 
 class PW_Listagem extends HTMLElement {
 
+    observers = []
+
     cadastro = new PW_Cadastro()
 
-    async notify() {
-        this.cadastro.notify()
+    subscribe(observer) {
+        this.observers.push(observer);
+    }
+    
+    notifyObservers(data) {
+        this.observers.forEach((observer) => {
+            observer.update(data)
+        });
+    }
+    
+    notify(data) {
+        this.disciplinas = data;
+        this.update();
     }
     
     async connectedCallback() {
+        const pwCadastro = document.querySelector('pw-cadastro');
+        if (pwCadastro) {
+            pwCadastro.subscribe(this);
+        }
         let clone = $template.content.cloneNode(true);
         this.appendChild(clone);
         this.$disciplinas = this.querySelector("div");
         this.$contagem = this.querySelector("p");
         this.disciplinas = await this.cadastro.get_disciplinas()
-        this.update();
+        this.notify(this.disciplinas)
     }
 
     update() {
@@ -42,12 +59,10 @@ class PW_Listagem extends HTMLElement {
 
     async handle_click($d, i) {
         await this.cadastro.del_disciplina(i)
-        this.disciplinas.splice(i,1)
-        this.notify()
-        this.update()
-
+        this.disciplinas.splice(i, 1);
+        this.notify(this.disciplinas)
+        this.notifyObservers(this.disciplinas)
     }
 }
 
-//setInterval(() => location.reload(true), 2000);
 customElements.define("pw-listagem", PW_Listagem);

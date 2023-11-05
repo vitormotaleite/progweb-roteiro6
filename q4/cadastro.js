@@ -14,26 +14,34 @@ $template.innerHTML = `
 
 class PW_Cadastro extends HTMLElement {
 
-    async get_disciplinas() {
-        return backend.fetch_disciplinas()
+    observers = []
 
+    subscribe(observer) {
+        this.observers.push(observer);
+    }
+    
+    notifyObservers(data) {
+        this.observers.forEach((observer) => {
+          observer.update(data)
+          observer.notify(data)
+        });
+    }
+
+    async get_disciplinas() {
+        return backend.fetch_disciplinas();
     }
 
     async del_disciplina(i) {
-        return backend.del_disciplina(i)
+        backend.del_disciplina(i)
     }
 
-    async notify() {
-        if(window.Notification&&Notification.permission !== 'denied') {
-            Notification.requestPermission(function(status) {
-                let n = new Notification('ATENÇÂO', {
-                    body: 'disciplina alterada'
-                })
-            })
-        }
+    notify(data) {
+        this.disciplinas = data;
+        this.update();
     }
-    
+
     async connectedCallback() {
+        
         let clone = $template.content.cloneNode(true);
         this.appendChild(clone);
 
@@ -47,7 +55,11 @@ class PW_Cadastro extends HTMLElement {
         this.$nome.addEventListener("change", () => this.$periodo.focus());
         this.$periodo.addEventListener("change", () => this.$button.focus());
         this.$nome.focus();
-        this.update();
+        const pwListagem = document.querySelector('pw-listagem');
+        if (pwListagem) {
+            pwListagem.subscribe(this);
+        }
+        this.update()
     }
 
     async handle_click() {
@@ -67,13 +79,13 @@ class PW_Cadastro extends HTMLElement {
         this.$button.innerText = "salvando...";
         await backend.add_disciplina({nome, periodo});
         this.disciplinas.push({nome, periodo});
-        this.notify()
+        this.notifyObservers(this.disciplinas);
         this.$nome.value = "";
         this.$periodo.value = "";
         this.$nome.disabled = false;
         this.$periodo.disabled = false;
         this.$nome.focus();
-        this.update();
+        this.update()
     }
 
     update() {
@@ -81,9 +93,8 @@ class PW_Cadastro extends HTMLElement {
         this.$button.innerText = "Salva disciplina";
         this.$contagem.innerText = this.disciplinas.length;
     }
-
 }
 
-export{PW_Cadastro}
+export {PW_Cadastro}
 
 customElements.define("pw-cadastro", PW_Cadastro);

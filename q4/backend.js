@@ -18,7 +18,6 @@ async function add_disciplina(disciplina) {
             res(disciplina);
         }, latencia());
     });
-    
 }
 
 async function del_disciplina(idx) {
